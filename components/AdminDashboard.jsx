@@ -394,7 +394,7 @@ export default function AdminDashboard() {
                 label="Link Gambar"
                 value={catalog[activeAsset]}
                 onChange={(value) => updateCatalog(activeAsset, value)}
-                type="url"
+                type="text"
                 rows={1}
                 placeholder="https://..."
               />
@@ -494,7 +494,7 @@ export default function AdminDashboard() {
                     label={`Link Foto Produk ${index + 1}`}
                     value={product.image}
                     onChange={(value) => updateProduct(index, "image", value)}
-                    type="url"
+                    type="text"
                     rows={1}
                   />
                   <Field
