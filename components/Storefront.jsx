@@ -32,6 +32,45 @@ function BrandMark({ catalog }) {
   );
 }
 
+function hexToRgb(hex) {
+  const fallback = { r: 255, g: 47, b: 125 };
+  const value = String(hex || "").replace("#", "");
+
+  if (!/^[0-9a-f]{6}$/i.test(value)) return fallback;
+
+  return {
+    r: parseInt(value.slice(0, 2), 16),
+    g: parseInt(value.slice(2, 4), 16),
+    b: parseInt(value.slice(4, 6), 16)
+  };
+}
+
+function rgba(hex, alpha) {
+  const { r, g, b } = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function storefrontThemeStyle(catalog) {
+  const theme = catalog.theme || defaultData.theme;
+
+  return {
+    "--brand": theme.primary,
+    "--brand-dark": theme.primary,
+    "--blue": theme.secondary,
+    "--accent": theme.accent,
+    "--ink": theme.text,
+    "--muted": theme.muted,
+    "--surface": theme.surface,
+    "--soft": theme.background,
+    "--page-bg": theme.background,
+    "--hero-overlay": rgba(theme.heroOverlay, 0.9),
+    "--hero-overlay-mid": rgba(theme.heroOverlay, 0.68),
+    "--hero-glow": rgba(theme.primary, 0.52),
+    "--hero-glow-alt": rgba(theme.secondary, 0.38),
+    "--theme-shadow": rgba(theme.primary, 0.22)
+  };
+}
+
 export default function Storefront() {
   const [catalog, setCatalog] = useState(defaultData);
 
@@ -57,7 +96,7 @@ export default function Storefront() {
   );
 
   return (
-    <main className="store-page">
+    <main className="store-page" style={storefrontThemeStyle(catalog)}>
       <a
         className="whatsapp-float"
         href={whatsappLink(catalog.whatsappNumber, introMessage)}
