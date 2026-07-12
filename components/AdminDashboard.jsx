@@ -31,6 +31,35 @@ function Field({ label, value, onChange, type = "text", rows = 3, help, placehol
   );
 }
 
+function ColorField({ label, value, onChange, help }) {
+  const controlId = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const safeValue = /^#[0-9a-f]{6}$/i.test(value || "") ? value : "#ff2f7d";
+
+  return (
+    <label className="admin-field color-field" htmlFor={controlId}>
+      <span>{label}</span>
+      <div className="color-control">
+        <input
+          id={controlId}
+          type="color"
+          value={safeValue}
+          onChange={(event) => onChange(event.target.value)}
+          aria-label={`Pilih ${label}`}
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="#ff2f7d"
+          pattern="#[0-9a-fA-F]{6}"
+          aria-label={`${label} dalam format hex`}
+        />
+      </div>
+      {help ? <small>{help}</small> : null}
+    </label>
+  );
+}
+
 function BrandMark({ catalog }) {
   return (
     <span className="brand-mark">
@@ -103,6 +132,16 @@ export default function AdminDashboard() {
 
   function updateCatalog(field, value) {
     setCatalog((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateTheme(field, value) {
+    setCatalog((current) => ({
+      ...current,
+      theme: {
+        ...(current.theme || defaultData.theme),
+        [field]: value
+      }
+    }));
   }
 
   function updateTrustBadge(index, value) {
@@ -306,6 +345,55 @@ export default function AdminDashboard() {
               value={catalog.topTagline}
               onChange={(value) => updateCatalog("topTagline", value)}
               rows={1}
+            />
+          </fieldset>
+
+          <fieldset className="settings-panel theme-panel">
+            <legend>Tema warna website</legend>
+            <ColorField
+              label="Warna Utama"
+              value={(catalog.theme || defaultData.theme).primary}
+              onChange={(value) => updateTheme("primary", value)}
+              help="Dipakai untuk tombol, badge, dan aksen utama."
+            />
+            <ColorField
+              label="Warna Kedua"
+              value={(catalog.theme || defaultData.theme).secondary}
+              onChange={(value) => updateTheme("secondary", value)}
+              help="Dipakai untuk gradient dan variasi aksen."
+            />
+            <ColorField
+              label="Warna Accent"
+              value={(catalog.theme || defaultData.theme).accent}
+              onChange={(value) => updateTheme("accent", value)}
+              help="Dipakai untuk label kecil dan angka step."
+            />
+            <ColorField
+              label="Background"
+              value={(catalog.theme || defaultData.theme).background}
+              onChange={(value) => updateTheme("background", value)}
+              help="Warna dasar halaman publik."
+            />
+            <ColorField
+              label="Teks Utama"
+              value={(catalog.theme || defaultData.theme).text}
+              onChange={(value) => updateTheme("text", value)}
+            />
+            <ColorField
+              label="Teks Muted"
+              value={(catalog.theme || defaultData.theme).muted}
+              onChange={(value) => updateTheme("muted", value)}
+            />
+            <ColorField
+              label="Overlay Hero"
+              value={(catalog.theme || defaultData.theme).heroOverlay}
+              onChange={(value) => updateTheme("heroOverlay", value)}
+              help="Bikin area hero lebih gelap/terang di atas banner."
+            />
+            <ColorField
+              label="Warna Panel"
+              value={(catalog.theme || defaultData.theme).surface}
+              onChange={(value) => updateTheme("surface", value)}
             />
           </fieldset>
 
