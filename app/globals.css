@@ -37,6 +37,7 @@ a {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -137,6 +138,12 @@ img {
   font-weight: 800;
 }
 
+.nav-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .brand-mark {
   overflow: hidden;
   width: 36px;
@@ -159,7 +166,8 @@ img {
 .nav-whatsapp,
 .primary-action,
 .secondary-action,
-.order-button {
+.order-button,
+.mode-toggle {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -181,6 +189,19 @@ img {
   background: #ffffff;
 }
 
+.mode-toggle {
+  width: 44px;
+  padding: 0;
+  color: #111217;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.mode-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
 .primary-action {
   padding: 0 20px;
   color: #ffffff;
@@ -198,7 +219,8 @@ img {
 .nav-whatsapp:hover,
 .primary-action:hover,
 .secondary-action:hover,
-.order-button:hover {
+.order-button:hover,
+.mode-toggle:hover {
   transform: translateY(-2px);
 }
 
@@ -461,6 +483,13 @@ h1 {
   color: var(--ink);
 }
 
+.store-page[data-mode="light"] {
+  --page-bg: #fff9fc;
+  --soft: #fff3f9;
+  --hero-overlay: rgba(255, 255, 255, 0.2);
+  --hero-overlay-mid: rgba(255, 255, 255, 0.12);
+}
+
 .whatsapp-float {
   position: fixed;
   right: 18px;
@@ -595,7 +624,26 @@ h1 {
   text-transform: uppercase;
 }
 
+.checkbox-control {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #d8dce5;
+  border-radius: var(--radius);
+  background: #ffffff;
+  font-weight: 800;
+}
+
+.checkbox-control input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--brand);
+}
+
 input,
+select,
 textarea {
   width: 100%;
   min-width: 0;
@@ -607,6 +655,11 @@ textarea {
 }
 
 input {
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+select {
   min-height: 44px;
   padding: 0 12px;
 }
@@ -625,6 +678,7 @@ textarea {
 }
 
 input:focus,
+select:focus,
 textarea:focus {
   border-color: var(--brand);
   box-shadow: 0 0 0 4px rgba(255, 79, 163, 0.14);
@@ -942,6 +996,12 @@ button:disabled {
   .secondary-action,
   .nav-whatsapp {
     width: 100%;
+  }
+
+  .nav-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
   }
 
   .whatsapp-float {
