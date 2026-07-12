@@ -66,10 +66,13 @@ img {
 .store-page {
   min-height: 100vh;
   background:
-    linear-gradient(90deg, var(--theme-shadow, rgba(183, 25, 107, 0.07)) 1px, transparent 1px),
-    linear-gradient(180deg, var(--theme-shadow, rgba(183, 25, 107, 0.07)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line, rgba(183, 25, 107, 0.07)) 1px, transparent 1px),
+    linear-gradient(180deg, var(--grid-line, rgba(183, 25, 107, 0.07)) 1px, transparent 1px),
     linear-gradient(180deg, var(--page-bg, #fff7fb) 0%, var(--surface) 38%, var(--page-bg, #fff7fb) 100%);
-  background-size: 42px 42px;
+  background-size:
+    42px 42px,
+    42px 42px,
+    auto;
 }
 
 .hero-section {
