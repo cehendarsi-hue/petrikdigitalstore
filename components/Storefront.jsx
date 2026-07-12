@@ -183,7 +183,6 @@ export default function Storefront() {
 
       <footer className="site-footer">
         <span>{catalog.storeName}</span>
-        <a href="/admin">Admin</a>
       </footer>
     </main>
   );
