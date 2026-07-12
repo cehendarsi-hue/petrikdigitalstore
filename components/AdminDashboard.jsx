@@ -47,18 +47,57 @@ function PencilIcon() {
   );
 }
 
+function fileToImage(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = URL.createObjectURL(file);
+  });
+}
+
+async function prepareImageUpload(file, maxSize = 1800) {
+  if (!file || !file.type.startsWith("image/") || file.type === "image/gif") {
+    return file;
+  }
+
+  const image = await fileToImage(file);
+  const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d");
+  context.drawImage(image, 0, 0, width, height);
+  URL.revokeObjectURL(image.src);
+
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+  if (!blob || blob.size >= file.size) return file;
+
+  const safeName = file.name.replace(/\.[^.]+$/, "");
+  return new File([blob], `${safeName}.jpg`, { type: "image/jpeg" });
+}
+
 export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [catalog, setCatalog] = useState(defaultData);
   const [status, setStatus] = useState("Masukkan password untuk mulai edit katalog.");
   const [saving, setSaving] = useState(false);
   const [activeAsset, setActiveAsset] = useState("logoImage");
+  const [storageStatus, setStorageStatus] = useState({ blobReady: true, isProduction: false });
 
   useEffect(() => {
     fetch("/api/products", { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => setCatalog(data))
       .catch(() => setStatus("Data lokal default dipakai sementara."));
+
+    fetch("/api/config", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => setStorageStatus(data))
+      .catch(() => setStorageStatus({ blobReady: true, isProduction: false }));
   }, []);
 
   function updateCatalog(field, value) {
@@ -120,10 +159,11 @@ export default function AdminDashboard() {
   async function uploadImage(index, file) {
     if (!file) return;
 
-    setStatus("Mengupload foto produk...");
+    setStatus("Menyiapkan dan mengupload foto produk...");
     const formData = new FormData();
+    const preparedFile = await prepareImageUpload(file, 1400);
     formData.append("password", password);
-    formData.append("file", file);
+    formData.append("file", preparedFile);
 
     try {
       const response = await fetch("/api/upload", {
@@ -146,10 +186,12 @@ export default function AdminDashboard() {
   async function uploadAsset(field, file) {
     if (!file) return;
 
-    setStatus("Mengupload aset visual...");
+    setStatus("Menyiapkan dan mengupload aset visual...");
     const formData = new FormData();
+    const maxSize = field === "logoImage" ? 720 : 1800;
+    const preparedFile = await prepareImageUpload(file, maxSize);
     formData.append("password", password);
-    formData.append("file", file);
+    formData.append("file", preparedFile);
 
     try {
       const response = await fetch("/api/upload", {
@@ -218,6 +260,16 @@ export default function AdminDashboard() {
           <p className="status-text" role="status" aria-live="polite">
             {status}
           </p>
+
+          {storageStatus.isProduction && !storageStatus.blobReady ? (
+            <div className="config-warning" role="alert">
+              <strong>Upload belum aktif di Vercel.</strong>
+              <span>
+                Hubungkan Vercel Blob ke project ini supaya upload foto, banner, icon, dan save
+                katalog bisa tersimpan permanen.
+              </span>
+            </div>
+          ) : null}
 
           <fieldset className="settings-panel">
             <legend id="admin-title">Identitas toko</legend>
