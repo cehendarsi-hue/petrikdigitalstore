@@ -85,6 +85,7 @@ export default function AdminDashboard() {
   const [catalog, setCatalog] = useState(defaultData);
   const [status, setStatus] = useState("Masukkan password untuk mulai edit katalog.");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState("");
   const [activeAsset, setActiveAsset] = useState("logoImage");
   const [storageStatus, setStorageStatus] = useState({ blobReady: true, isProduction: false });
 
@@ -132,6 +133,12 @@ export default function AdminDashboard() {
 
   async function saveCatalog(event) {
     event?.preventDefault();
+
+    if (uploading) {
+      setStatus("Tunggu upload selesai dulu, baru simpan perubahan.");
+      return;
+    }
+
     setSaving(true);
     setStatus("Menyimpan perubahan...");
 
@@ -159,13 +166,14 @@ export default function AdminDashboard() {
   async function uploadImage(index, file) {
     if (!file) return;
 
+    setUploading(`product-${index}`);
     setStatus("Menyiapkan dan mengupload foto produk...");
-    const formData = new FormData();
-    const preparedFile = await prepareImageUpload(file, 1400);
-    formData.append("password", password);
-    formData.append("file", preparedFile);
-
     try {
+      const formData = new FormData();
+      const preparedFile = await prepareImageUpload(file, 1400);
+      formData.append("password", password);
+      formData.append("file", preparedFile);
+
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData
@@ -177,23 +185,26 @@ export default function AdminDashboard() {
       }
 
       updateProduct(index, "image", result.url);
-      setStatus("Foto berhasil diupload. Klik Simpan Perubahan untuk publish.");
+      setStatus("Foto berhasil diupload dan preview sudah diganti. Klik Simpan Perubahan.");
     } catch (error) {
-      setStatus(error.message);
+      setStatus(error.message || "Upload foto gagal.");
+    } finally {
+      setUploading("");
     }
   }
 
   async function uploadAsset(field, file) {
     if (!file) return;
 
+    setUploading(field);
     setStatus("Menyiapkan dan mengupload aset visual...");
-    const formData = new FormData();
-    const maxSize = field === "logoImage" ? 720 : 1800;
-    const preparedFile = await prepareImageUpload(file, maxSize);
-    formData.append("password", password);
-    formData.append("file", preparedFile);
-
     try {
+      const formData = new FormData();
+      const maxSize = field === "logoImage" ? 720 : 1800;
+      const preparedFile = await prepareImageUpload(file, maxSize);
+      formData.append("password", password);
+      formData.append("file", preparedFile);
+
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData
@@ -205,9 +216,11 @@ export default function AdminDashboard() {
       }
 
       updateCatalog(field, result.url);
-      setStatus("Aset visual berhasil diupload. Klik Simpan Perubahan untuk publish.");
+      setStatus("Aset visual berhasil diupload dan preview sudah diganti. Klik Simpan Perubahan.");
     } catch (error) {
-      setStatus(error.message);
+      setStatus(error.message || "Upload aset visual gagal.");
+    } finally {
+      setUploading("");
     }
   }
 
@@ -252,8 +265,8 @@ export default function AdminDashboard() {
               />
               <small id="password-help">Lokal default: admin123. Di Vercel pakai ADMIN_PASSWORD.</small>
             </label>
-            <button className="primary-action save-button" type="submit" disabled={saving}>
-              {saving ? "Menyimpan..." : "Simpan Perubahan"}
+            <button className="primary-action save-button" type="submit" disabled={saving || Boolean(uploading)}>
+              {saving ? "Menyimpan..." : uploading ? "Upload Berjalan..." : "Simpan Perubahan"}
             </button>
           </div>
 
@@ -372,8 +385,10 @@ export default function AdminDashboard() {
                   id={`${activeAsset}-upload`}
                   type="file"
                   accept="image/*"
+                  disabled={Boolean(uploading)}
                   onChange={(event) => uploadAsset(activeAsset, event.target.files?.[0])}
                 />
+                {uploading === activeAsset ? <small>Sedang upload gambar...</small> : null}
               </label>
               <Field
                 label="Link Gambar"
@@ -470,8 +485,10 @@ export default function AdminDashboard() {
                       id={`product-file-${index}`}
                       type="file"
                       accept="image/*"
+                      disabled={Boolean(uploading)}
                       onChange={(event) => uploadImage(index, event.target.files?.[0])}
                     />
+                    {uploading === `product-${index}` ? <small>Sedang upload foto produk...</small> : null}
                   </label>
                   <Field
                     label={`Link Foto Produk ${index + 1}`}
