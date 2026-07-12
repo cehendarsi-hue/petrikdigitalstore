@@ -60,6 +60,44 @@ function ColorField({ label, value, onChange, help }) {
   );
 }
 
+function SelectField({ label, value, onChange, options, help }) {
+  const controlId = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+  return (
+    <label className="admin-field" htmlFor={controlId}>
+      <span>{label}</span>
+      <select id={controlId} value={value} onChange={(event) => onChange(event.target.value)}>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {help ? <small>{help}</small> : null}
+    </label>
+  );
+}
+
+function CheckboxField({ label, checked, onChange, help }) {
+  const controlId = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+  return (
+    <label className="admin-field checkbox-field" htmlFor={controlId}>
+      <span>{label}</span>
+      <span className="checkbox-control">
+        <input
+          id={controlId}
+          type="checkbox"
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+        />
+        <span>{checked ? "Aktif" : "Nonaktif"}</span>
+      </span>
+      {help ? <small>{help}</small> : null}
+    </label>
+  );
+}
+
 function BrandMark({ catalog }) {
   return (
     <span className="brand-mark">
@@ -139,6 +177,16 @@ export default function AdminDashboard() {
       ...current,
       theme: {
         ...(current.theme || defaultData.theme),
+        [field]: value
+      }
+    }));
+  }
+
+  function updateAppearance(field, value) {
+    setCatalog((current) => ({
+      ...current,
+      appearance: {
+        ...(current.appearance || defaultData.appearance),
         [field]: value
       }
     }));
@@ -350,6 +398,22 @@ export default function AdminDashboard() {
 
           <fieldset className="settings-panel theme-panel">
             <legend>Tema warna website</legend>
+            <SelectField
+              label="Default Tampilan"
+              value={(catalog.appearance || defaultData.appearance).defaultMode}
+              onChange={(value) => updateAppearance("defaultMode", value)}
+              options={[
+                { value: "dark", label: "Dark Mode" },
+                { value: "light", label: "Light Mode" }
+              ]}
+              help="Mode awal untuk pengunjung baru."
+            />
+            <CheckboxField
+              label="Tampilkan Tombol Dark/Light"
+              checked={(catalog.appearance || defaultData.appearance).showToggle}
+              onChange={(value) => updateAppearance("showToggle", value)}
+              help="Kalau aktif, pengunjung bisa ganti mode sendiri."
+            />
             <ColorField
               label="Warna Utama"
               value={(catalog.theme || defaultData.theme).primary}
