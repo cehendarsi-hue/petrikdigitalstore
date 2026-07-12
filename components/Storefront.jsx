@@ -24,6 +24,22 @@ function PhoneIcon() {
   );
 }
 
+function SunIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 4.2a1 1 0 0 0 1-1V2a1 1 0 1 0-2 0v1.2a1 1 0 0 0 1 1Zm0 15.6a1 1 0 0 0-1 1V22a1 1 0 1 0 2 0v-1.2a1 1 0 0 0-1-1Zm8.8-8.8H22a1 1 0 1 1 0 2h-1.2a1 1 0 1 1 0-2ZM2 11a1 1 0 1 0 0 2h1.2a1 1 0 1 0 0-2H2Zm16.36-6.78a1 1 0 0 1 1.42 1.42l-.86.85A1 1 0 1 1 17.5 5.08l.86-.86ZM5.08 17.5l-.86.86a1 1 0 1 0 1.42 1.42l.85-.86a1 1 0 1 0-1.41-1.42Zm14.7.86a1 1 0 0 1-1.42 1.42l-.86-.86a1 1 0 0 1 1.42-1.42l.86.86ZM5.64 4.22a1 1 0 0 0-1.42 1.42l.86.85A1 1 0 0 0 6.5 5.08l-.86-.86ZM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M21 14.6A8.45 8.45 0 0 1 9.4 3a.9.9 0 0 0-1.1-1.1 10.3 10.3 0 1 0 13.8 13.8.9.9 0 0 0-1.1-1.1Z" />
+    </svg>
+  );
+}
+
 function BrandMark({ catalog }) {
   return (
     <span className="brand-mark">
@@ -50,8 +66,9 @@ function rgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function storefrontThemeStyle(catalog) {
+function storefrontThemeStyle(catalog, mode) {
   const theme = catalog.theme || defaultData.theme;
+  const isLight = mode === "light";
 
   return {
     "--brand": theme.primary,
@@ -61,10 +78,10 @@ function storefrontThemeStyle(catalog) {
     "--ink": theme.text,
     "--muted": theme.muted,
     "--surface": theme.surface,
-    "--soft": theme.background,
-    "--page-bg": theme.background,
-    "--hero-overlay": rgba(theme.heroOverlay, 0.9),
-    "--hero-overlay-mid": rgba(theme.heroOverlay, 0.68),
+    "--soft": isLight ? "#fff3f9" : theme.background,
+    "--page-bg": isLight ? "#fff9fc" : theme.background,
+    "--hero-overlay": rgba(theme.heroOverlay, isLight ? 0.68 : 0.9),
+    "--hero-overlay-mid": rgba(theme.heroOverlay, isLight ? 0.42 : 0.68),
     "--hero-glow": rgba(theme.primary, 0.52),
     "--hero-glow-alt": rgba(theme.secondary, 0.38),
     "--grid-line": rgba(theme.primary, 0.08),
@@ -74,6 +91,7 @@ function storefrontThemeStyle(catalog) {
 
 export default function Storefront() {
   const [catalog, setCatalog] = useState(defaultData);
+  const [mode, setMode] = useState(defaultData.appearance.defaultMode);
 
   useEffect(() => {
     let active = true;
@@ -91,13 +109,27 @@ export default function Storefront() {
     };
   }, []);
 
+  useEffect(() => {
+    const savedMode = window.localStorage.getItem("petrik-theme-mode");
+    const defaultMode = catalog.appearance?.defaultMode || defaultData.appearance.defaultMode;
+    setMode(savedMode === "light" || savedMode === "dark" ? savedMode : defaultMode);
+  }, [catalog.appearance?.defaultMode]);
+
+  function toggleMode() {
+    setMode((current) => {
+      const nextMode = current === "dark" ? "light" : "dark";
+      window.localStorage.setItem("petrik-theme-mode", nextMode);
+      return nextMode;
+    });
+  }
+
   const introMessage = useMemo(
     () => `Halo ${catalog.storeName}, saya mau tanya-tanya produk digitalnya.`,
     [catalog.storeName]
   );
 
   return (
-    <main className="store-page" style={storefrontThemeStyle(catalog)}>
+    <main className="store-page" data-mode={mode} style={storefrontThemeStyle(catalog, mode)}>
       <a
         className="whatsapp-float"
         href={whatsappLink(catalog.whatsappNumber, introMessage)}
@@ -129,14 +161,27 @@ export default function Storefront() {
             <BrandMark catalog={catalog} />
             <span>{catalog.storeName}</span>
           </a>
-          <a
-            className="nav-whatsapp"
-            href={whatsappLink(catalog.whatsappNumber, introMessage)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Konsultasi
-          </a>
+          <div className="nav-actions">
+            {catalog.appearance?.showToggle ? (
+              <button
+                className="mode-toggle"
+                type="button"
+                onClick={toggleMode}
+                aria-label={mode === "dark" ? "Aktifkan light mode" : "Aktifkan dark mode"}
+                aria-pressed={mode === "dark"}
+              >
+                {mode === "dark" ? <SunIcon /> : <MoonIcon />}
+              </button>
+            ) : null}
+            <a
+              className="nav-whatsapp"
+              href={whatsappLink(catalog.whatsappNumber, introMessage)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Konsultasi
+            </a>
+          </div>
         </nav>
 
         <div className="hero-content" id="top">
