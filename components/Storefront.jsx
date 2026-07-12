@@ -67,6 +67,7 @@ function storefrontThemeStyle(catalog) {
     "--hero-overlay-mid": rgba(theme.heroOverlay, 0.68),
     "--hero-glow": rgba(theme.primary, 0.52),
     "--hero-glow-alt": rgba(theme.secondary, 0.38),
+    "--grid-line": rgba(theme.primary, 0.08),
     "--theme-shadow": rgba(theme.primary, 0.22)
   };
 }
