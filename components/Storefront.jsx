@@ -80,8 +80,8 @@ function storefrontThemeStyle(catalog, mode) {
     "--surface": theme.surface,
     "--soft": isLight ? "#fff3f9" : theme.background,
     "--page-bg": isLight ? "#fff9fc" : theme.background,
-    "--hero-overlay": rgba(theme.heroOverlay, isLight ? 0.68 : 0.9),
-    "--hero-overlay-mid": rgba(theme.heroOverlay, isLight ? 0.42 : 0.68),
+    "--hero-overlay": rgba(theme.heroOverlay, 0.96),
+    "--hero-overlay-mid": rgba(theme.heroOverlay, 0.82),
     "--hero-glow": rgba(theme.primary, 0.52),
     "--hero-glow-alt": rgba(theme.secondary, 0.38),
     "--grid-line": rgba(theme.primary, 0.08),
@@ -140,10 +140,7 @@ export default function Storefront() {
         <WhatsAppIcon />
       </a>
 
-      <section
-        className="hero-section"
-        style={{ "--hero-banner": `url("${catalog.bannerImage}")` }}
-      >
+      <section className="hero-section">
         <div className="contact-strip">
           <span>{catalog.topTagline}</span>
           <a
