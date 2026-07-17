@@ -81,14 +81,9 @@ img {
   padding: 24px;
   color: #ffffff;
   background:
-    radial-gradient(circle at 78% 12%, var(--hero-glow, rgba(255, 79, 163, 0.52)), transparent 30%),
-    radial-gradient(circle at 8% 76%, var(--hero-glow-alt, rgba(139, 92, 246, 0.38)), transparent 26%),
-    linear-gradient(90deg, var(--hero-overlay, rgba(18, 10, 24, 0.94)), var(--hero-overlay-mid, rgba(91, 18, 72, 0.74)), rgba(255, 47, 125, 0.2)),
-    var(
-        --hero-banner,
-        url("https://images.unsplash.com/photo-1607082350899-7e105aa886ae?auto=format&fit=crop&w=1800&q=80")
-      )
-      center/cover;
+    radial-gradient(circle at 82% 14%, var(--hero-glow, rgba(255, 79, 163, 0.42)), transparent 32%),
+    radial-gradient(circle at 12% 76%, var(--hero-glow-alt, rgba(139, 92, 246, 0.34)), transparent 30%),
+    linear-gradient(135deg, var(--hero-overlay, rgba(18, 10, 24, 0.98)) 0%, var(--hero-overlay-mid, rgba(61, 20, 62, 0.94)) 54%, color-mix(in srgb, var(--brand) 42%, var(--blue)) 100%);
 }
 
 .contact-strip {
@@ -486,8 +481,6 @@ h1 {
 .store-page[data-mode="light"] {
   --page-bg: #fff9fc;
   --soft: #fff3f9;
-  --hero-overlay: rgba(255, 255, 255, 0.2);
-  --hero-overlay-mid: rgba(255, 255, 255, 0.12);
 }
 
 .whatsapp-float {
